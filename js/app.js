@@ -44,8 +44,9 @@ const displayPhones = (phones, dataLimit) =>{
         <div class="card p-4">
         <img src="${phone.image}" class="card-img-top p-4" alt="...">
         <div class="card-body">
-          <h5 class="card-title">${phone.phone_name}</h5>
-          <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                <h5 class="card-title">${phone.phone_name}</h5>
+                <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                <button onclick="loadPhoneDetails('${phone.slug}')" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#phoneDetails">More Details</button>
         </div>
       </div>
         `;
@@ -64,8 +65,17 @@ const processSearch = (dataLimit) => {
   
 }
 
+// input field btn click handler
 document.getElementById('btn-search').addEventListener('click', function(){
   processSearch(10);
+})
+
+// input field enter key handler
+
+document.getElementById('search-field').addEventListener('keypress', function(e){
+    if(e.key === 'Enter'){
+        processSearch(10);
+    }
 })
 
 const toggleSpinner = isLoading => {
@@ -81,5 +91,29 @@ const toggleSpinner = isLoading => {
 document.getElementById('btn-show-all').addEventListener('click', function(){
     processSearch();
 })
+
+const loadPhoneDetails = async id => {
+    const url = `https://openapi.programming-hero.com/api/phone/${id}`
+    const res = await fetch(url);
+    const data = await res.json();
+    displayPhoneDetails(data.data);
+}
+
+const displayPhoneDetails = phone => {
+    console.log(phone);
+    const modalTitle = document.getElementById('phoneDetailsLabel');
+    modalTitle.innerText = phone.name;
+    const phoneDetails = document.getElementById('phone-details');
+    phoneDetails.innerHTML = `
+    <div class="p-5"><img src="${phone.image}" class="card-img-top p-4" alt="...">
+    </div>
+    
+    <p>  <strong>Brand:</strong>  ${phone.brand ? phone.brand : 'No date found'}</p>
+    <p>  <strong>Release Date:</strong>  ${phone.releaseDate ? phone.releaseDate : 'No release date found'}</p>
+    <p>  <strong>Storage:</strong>  ${phone.mainFeatures ? phone.mainFeatures.storage : 'No information found'}</p>
+    <p>  <strong>Display Size:</strong>  ${phone.mainFeatures ? phone.mainFeatures.displaySize : 'No information found'}</p>
+    <p>  <strong>Chip set:</strong>  ${phone.mainFeatures ? phone.mainFeatures.chipSet : 'No information found'}</p>
+    `;
+}
 
 // loadPhones();
